@@ -59,7 +59,8 @@ def main(args=sys.argv[1:]):
                                   no_capture=options.no_capture,
                                   capture_area=options.capture_area,
                                   capture_file=options.capture_file,
-                                  sync_time=options.sync_time)
+                                  sync_time=options.sync_time,
+                                  flush_caches=options.flush_caches)
 
     # save logs if applicable
     testlog.save_logs(http_request_log_path=options.request_log_file,

@@ -66,6 +66,8 @@ class TestOptionParser(CaptureOptionParser):
                         default="{}",
                         help="Extra profile preference for Firefox browsers. "
                         "Must be passed in as a JSON dictionary")
+        self.add_option("--flush-caches", action="store_true", dest="flush_caches",
+                        help="Flush operating system caches before running tests")
 
     def parse_args(self):
         (options, args) = CaptureOptionParser.parse_args(self)

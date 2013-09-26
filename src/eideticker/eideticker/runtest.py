@@ -15,7 +15,7 @@ def run_test(testkey, capture_device, appname, capture_name,
              request_log_file=None, actions_log_file=None,
              log_checkerboard_stats=False, extra_env_vars={},
              capture_area=None, no_capture=False, capture_file=None,
-             sync_time=True):
+             sync_time=True, flush_caches=False):
     testinfo = get_testinfo(testkey)
     print "Testinfo: %s" % testinfo
 
@@ -84,6 +84,7 @@ def run_test(testkey, capture_device, appname, capture_name,
                     testpath_rel = testpath_rel, device = device,
                     actions = actions, extra_prefs = extra_prefs,
                     extra_env_vars = extra_env_vars,
+                    flush_caches = flush_caches,
                     capture_file = capture_file,
                     capture_controller = capture_controller,
                     capture_metadata = capture_metadata,

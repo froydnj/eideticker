@@ -20,7 +20,7 @@ class AndroidBrowserRunner(log.LoggingMixin):
     def __init__(self, dm, appname, url, tmpdir, preinitialize_user_profile=False,
                  open_url_after_launch=False, enable_profiling=False,
                  gecko_profiler_addon_dir=None, extra_prefs={},
-                 extra_env_vars={}):
+                 extra_env_vars={}, flush_caches=False):
         self.dm = dm
         self.appname = appname
         self.url = url
@@ -32,6 +32,7 @@ class AndroidBrowserRunner(log.LoggingMixin):
         self.extra_prefs = extra_prefs
         self.remote_profile_dir = None
         self.extra_env_vars = extra_env_vars
+        self.flush_caches = flush_caches
 
         activity_mappings = {
             'com.android.browser': '.BrowserActivity',
@@ -137,6 +138,14 @@ class AndroidBrowserRunner(log.LoggingMixin):
             time.sleep(10)
             self.dm.killProcess(self.appname)
 
+    def maybe_flush_caches(self):
+        if self.flush_caches:
+            self.log("Flushing caches")
+            output = self.dm.shellCheckOutput(["sh", "-c",
+                                               "echo 3 > /proc/sys/vm/drop_caches"],
+                                              root=True)
+            self.log(output)
+
     def start(self):
         self.log("Starting %s... " % self.appname)
 
@@ -159,16 +168,19 @@ class AndroidBrowserRunner(log.LoggingMixin):
             self.launch_fennec(mozEnv, url)
         else:
             self.is_profiling = False # never profiling with non-fennec browsers
+            self.maybe_flush_caches()
             self.dm.launchApplication(self.appname, self.activity, self.intent,
                                       url=url)
 
     def open_url(self):
+        self.maybe_flush_caches()
         self.dm.launchApplication(self.appname, self.activity, self.intent,
                                   url=self.url, failIfRunning=False)
 
     def launch_fennec(self, mozEnv, url):
         # sometimes fennec fails to start, so we'll try three times...
         for i in range(3):
+            self.maybe_flush_caches()
             self.log("Launching %s (try %s of 3)" % (self.appname, i+1))
             try:
                 self.dm.launchFennec(self.appname, url=url, mozEnv=mozEnv,
